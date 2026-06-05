@@ -172,7 +172,7 @@ body {
 /* --- DASHBOARD GRID --- */
 .dashboard-grid {
     display: grid;
-    grid-template-columns: 1fr 1.1fr 1.4fr;
+    grid-template-columns: 1fr 1fr;
     gap: 1.5rem;
     flex-grow: 1;
 }
@@ -1156,15 +1156,6 @@ body.timetable-edit-mode .subject-cell::after {
 }
 
 /* --- RESPONSIVE MEDIA QUERIES --- */
-@media (max-width: 1200px) {
-    .dashboard-grid {
-        grid-template-columns: 1fr 1fr;
-    }
-    .panel-right {
-        grid-column: span 2;
-    }
-}
-
 @media (max-width: 768px) {
     body {
         padding: 0.75rem;
@@ -1182,16 +1173,7 @@ body.timetable-edit-mode .subject-cell::after {
         grid-template-columns: 1fr;
         gap: 1rem;
     }
-    .panel-right {
-        grid-column: span 1;
-    }
     .picker-actions {
         grid-template-columns: 1fr;
-    }
-    .timetable-wrapper {
-        font-size: 0.8rem;
-    }
-    .subject-cell {
-        height: 52px;
     }
 }

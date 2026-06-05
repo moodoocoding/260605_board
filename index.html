@@ -118,45 +118,7 @@
             </div>
         </section>
 
-        <!-- RIGHT PANEL: Classroom Timetable -->
-        <section class="dashboard-panel panel-right" id="panel-timetable">
-            <div class="panel-header">
-                <h2><i class="fa-solid fa-calendar-days text-accent"></i> 오늘 & 이번 주 시간표</h2>
-                <button class="btn-sm btn-outline" id="btn-edit-timetable">
-                    <i class="fa-solid fa-pen-to-square"></i> 시간표 관리
-                </button>
-            </div>
 
-            <div class="panel-body">
-                <div class="timetable-wrapper">
-                    <table class="timetable-grid">
-                        <thead>
-                            <tr>
-                                <th>교시</th>
-                                <th>월</th>
-                                <th>화</th>
-                                <th>수</th>
-                                <th>목</th>
-                                <th>금</th>
-                            </tr>
-                        </thead>
-                        <tbody id="timetable-body">
-                            <!-- Will be filled by JavaScript -->
-                        </tbody>
-                    </table>
-                </div>
-
-                <div class="timetable-legend">
-                    <div class="legend-item"><span class="legend-dot dot-kor"></span> 국어</div>
-                    <div class="legend-item"><span class="legend-dot dot-math"></span> 수학</div>
-                    <div class="legend-item"><span class="legend-dot dot-sci"></span> 과학</div>
-                    <div class="legend-item"><span class="legend-dot dot-eng"></span> 영어</div>
-                    <div class="legend-item"><span class="legend-dot dot-pe"></span> 체육</div>
-                    <div class="legend-item"><span class="legend-dot dot-art"></span> 미술/음악</div>
-                    <div class="legend-item"><span class="legend-dot dot-soc"></span> 사회/창체</div>
-                </div>
-            </div>
-        </section>
     </main>
 
     <!-- MODAL: Edit Names -->
@@ -211,44 +173,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Edit Timetable Cell -->
-    <div class="modal-overlay" id="timetable-modal">
-        <div class="modal-container modal-small">
-            <div class="modal-header">
-                <h3><i class="fa-solid fa-edit"></i> 과목 변경</h3>
-                <button class="close-btn" id="close-timetable-modal">&times;</button>
-            </div>
-            <div class="modal-body">
-                <div class="form-group">
-                    <label for="subject-select">과목 선택:</label>
-                    <select id="subject-select">
-                        <option value="kor">국어</option>
-                        <option value="math">수학</option>
-                        <option value="sci">과학</option>
-                        <option value="eng">영어</option>
-                        <option value="pe">체육</option>
-                        <option value="art">미술</option>
-                        <option value="mus">음악</option>
-                        <option value="soc">사회</option>
-                        <option value="ext">창체</option>
-                        <option value="hr">조퇴/자치</option>
-                        <option value="free">자율</option>
-                        <option value="empty">비어있음</option>
-                    </select>
-                </div>
-                <div class="form-group">
-                    <label for="subject-name-input">과목 이름 직접 입력 (선택):</label>
-                    <input type="text" id="subject-name-input" placeholder="직접 입력 시 과목명 반영">
-                </div>
-                <div class="modal-actions">
-                    <input type="hidden" id="edit-cell-day">
-                    <input type="hidden" id="edit-cell-period">
-                    <button class="btn btn-text" id="btn-cancel-timetable">취소</button>
-                    <button class="btn btn-primary" id="btn-save-timetable">변경 적용</button>
-                </div>
-            </div>
-        </div>
-    </div>
+
 
     <!-- Particle/Confetti Container for Success Effects -->
     <div class="confetti-container" id="confetti-container"></div>

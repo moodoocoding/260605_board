@@ -19,41 +19,7 @@ document.addEventListener('DOMContentLoaded', () => {
         "전민서", "홍지유", "유윤아", "양지원", "백수빈"
     ];
 
-    const DEFAULT_TIMETABLE = {
-        // mon, tue, wed, thu, fri
-        // 1 to 6 periods
-        "1": { mon: { type: "kor", name: "" }, tue: { type: "math", name: "" }, wed: { type: "sci", name: "" }, thu: { type: "eng", name: "" }, fri: { type: "pe", name: "" } },
-        "2": { mon: { type: "math", name: "" }, tue: { type: "kor", name: "" }, wed: { type: "sci", name: "" }, thu: { type: "math", name: "" }, fri: { type: "kor", name: "" } },
-        "3": { mon: { type: "sci", name: "" }, tue: { type: "eng", name: "" }, wed: { type: "kor", name: "" }, thu: { type: "soc", name: "" }, fri: { type: "math", name: "" } },
-        "4": { mon: { type: "eng", name: "" }, tue: { type: "pe", name: "" }, wed: { type: "math", name: "" }, thu: { type: "kor", name: "" }, fri: { type: "eng", name: "" } },
-        "5": { mon: { type: "soc", name: "" }, tue: { type: "pe", name: "" }, wed: { type: "art", name: "" }, thu: { type: "ext", name: "" }, fri: { type: "hr", name: "" } },
-        "6": { mon: { type: "ext", name: "" }, tue: { type: "mus", name: "" }, wed: { type: "art", name: "" }, thu: { type: "free", name: "" }, fri: { type: "free", name: "" } }
-    };
 
-    const SUBJECT_METADATA = {
-        kor: { name: "국어", icon: "fa-book-open" },
-        math: { name: "수학", icon: "fa-calculator" },
-        sci: { name: "과학", icon: "fa-flask" },
-        eng: { name: "영어", icon: "fa-language" },
-        pe: { name: "체육", icon: "fa-dumbbell" },
-        art: { name: "미술", icon: "fa-palette" },
-        mus: { name: "음악", icon: "fa-music" },
-        soc: { name: "사회", icon: "fa-globe" },
-        ext: { name: "창체", icon: "fa-star" },
-        hr: { name: "자치", icon: "fa-comments" },
-        free: { name: "자율", icon: "fa-laptop-code" },
-        empty: { name: "비어있음", icon: "fa-minus" }
-    };
-
-    // Period Times for highlighting current class
-    const PERIOD_TIMES = [
-        { period: 1, start: "09:00", end: "09:50" },
-        { period: 2, start: "10:00", end: "10:50" },
-        { period: 3, start: "11:00", end: "11:50" },
-        { period: 4, start: "12:50", end: "13:40" },
-        { period: 5, start: "13:50", end: "14:40" },
-        { period: 6, start: "14:50", end: "15:40" }
-    ];
 
     // Local Storage helper functions
     const storage = {
@@ -70,15 +36,11 @@ document.addEventListener('DOMContentLoaded', () => {
     let classmates = storage.get('classmates_list', DEFAULT_CLASSMATES);
     let drawnClassmates = storage.get('drawn_classmates', []);
     let tickets = storage.get('drawn_tickets', []);
-    let timetable = storage.get('timetable_data', DEFAULT_TIMETABLE);
 
-    let isTimetableEditMode = false;
     let currentShuffling = false;
 
     // --- DOM ELEMENTS ---
     const liveClockEl = document.getElementById('live-clock');
-    const timetableBody = document.getElementById('timetable-body');
-    const btnEditTimetable = document.getElementById('btn-edit-timetable');
     
     // Name Picker DOM
     const nameDisplayCard = document.getElementById('name-display-card');
@@ -115,14 +77,7 @@ document.addEventListener('DOMContentLoaded', () => {
     const multiResultsArea = document.getElementById('multi-results-area');
     const multiResultsGrid = document.getElementById('multi-results-grid');
     
-    const timetableModal = document.getElementById('timetable-modal');
-    const closeTimetableModalBtn = document.getElementById('close-timetable-modal');
-    const btnCancelTimetable = document.getElementById('btn-cancel-timetable');
-    const btnSaveTimetable = document.getElementById('btn-save-timetable');
-    const subjectSelect = document.getElementById('subject-select');
-    const subjectNameInput = document.getElementById('subject-name-input');
-    const editCellDayInput = document.getElementById('edit-cell-day');
-    const editCellPeriodInput = document.getElementById('edit-cell-period');
+
 
     const confettiContainer = document.getElementById('confetti-container');
 
@@ -144,161 +99,12 @@ document.addEventListener('DOMContentLoaded', () => {
         const seconds = String(now.getSeconds()).padStart(2, '0');
         
         liveClockEl.textContent = `${year}. ${month}. ${date} (${dayLabel}) ${hours}:${minutes}:${seconds}`;
-        
-        // Check active period highlight
-        highlightCurrentPeriod(now);
-    }
-
-    function highlightCurrentPeriod(nowObj) {
-        // Reset current active rows and cells
-        const rows = timetableBody.querySelectorAll('tr');
-        rows.forEach(r => r.classList.remove('active-period'));
-        const cells = timetableBody.querySelectorAll('.subject-cell');
-        cells.forEach(c => c.classList.remove('active-cell'));
-        
-        const day = nowObj.getDay(); // 0: Sun, 1: Mon, ..., 6: Sat
-        // Only trigger highlight on school days (Mon-Fri)
-        if (day < 1 || day > 5) return;
-        
-        const dayNames = ['sun', 'mon', 'tue', 'wed', 'thu', 'fri', 'sat'];
-        const todayName = dayNames[day];
-        
-        const currentHours = nowObj.getHours();
-        const currentMinutes = nowObj.getMinutes();
-        const currentTotalMinutes = currentHours * 60 + currentMinutes;
-        
-        PERIOD_TIMES.forEach(pt => {
-            const [startH, startM] = pt.start.split(':').map(Number);
-            const [endH, endM] = pt.end.split(':').map(Number);
-            const startTotal = startH * 60 + startM;
-            const endTotal = endH * 60 + endM;
-            
-            if (currentTotalMinutes >= startTotal && currentTotalMinutes <= endTotal) {
-                // Find matching row
-                const targetRow = timetableBody.querySelector(`tr[data-period="${pt.period}"]`);
-                if (targetRow) {
-                    targetRow.classList.add('active-period');
-                    
-                    // Highlight the specific cell for today
-                    const targetCell = targetRow.querySelector(`td[data-day="${todayName}"]`);
-                    if (targetCell) {
-                        targetCell.classList.add('active-cell');
-                    }
-                }
-            }
-        });
     }
 
     setInterval(updateClock, 1000);
     updateClock(); // Initial run
 
 
-    // ==========================================================================
-    // MODULE 2: TIMETABLE RENDER & EDIT
-    // ==========================================================================
-    function renderTimetable() {
-        timetableBody.innerHTML = '';
-        
-        // Days loop keys
-        const days = ['mon', 'tue', 'wed', 'thu', 'fri'];
-        
-        for (let period = 1; period <= 6; period++) {
-            const tr = document.createElement('tr');
-            tr.setAttribute('data-period', period);
-            
-            // Period label cell
-            const timeRange = PERIOD_TIMES.find(pt => pt.period === period);
-            const timeText = timeRange ? `${timeRange.start}~${timeRange.end.split(':')[0]}:${timeRange.end.split(':')[1]}` : '';
-            
-            const tdLabel = document.createElement('td');
-            tdLabel.className = 'period-label';
-            tdLabel.innerHTML = `${period}교시 <span>${timeText}</span>`;
-            tr.appendChild(tdLabel);
-            
-            // Daily cells
-            days.forEach(day => {
-                const tdCell = document.createElement('td');
-                tdCell.className = 'subject-cell';
-                tdCell.setAttribute('data-day', day);
-                
-                const cellData = timetable[String(period)]?.[day] || { type: 'empty', name: '' };
-                const meta = SUBJECT_METADATA[cellData.type] || SUBJECT_METADATA.empty;
-                
-                tdCell.classList.add(`sub-${cellData.type}`);
-                
-                const dispName = cellData.name || meta.name;
-                tdCell.innerHTML = `
-                    <div class="cell-content">
-                        <i class="fa-solid ${meta.icon}"></i>
-                        <span class="subject-title">${dispName}</span>
-                    </div>
-                `;
-                
-                // Click handler
-                tdCell.addEventListener('click', () => {
-                    if (isTimetableEditMode) {
-                        openTimetableEditModal(day, period, cellData);
-                    }
-                });
-                
-                tr.appendChild(tdCell);
-            });
-            
-            timetableBody.appendChild(tr);
-        }
-    }
-
-    function toggleTimetableEdit() {
-        isTimetableEditMode = !isTimetableEditMode;
-        if (isTimetableEditMode) {
-            document.body.classList.add('timetable-edit-mode');
-            btnEditTimetable.innerHTML = '<i class="fa-solid fa-check"></i> 편집 완료';
-            btnEditTimetable.classList.remove('btn-outline');
-            btnEditTimetable.classList.add('btn-primary');
-        } else {
-            document.body.classList.remove('timetable-edit-mode');
-            btnEditTimetable.innerHTML = '<i class="fa-solid fa-pen-to-square"></i> 시간표 관리';
-            btnEditTimetable.classList.remove('btn-primary');
-            btnEditTimetable.classList.add('btn-outline');
-        }
-    }
-
-    function openTimetableEditModal(day, period, cellData) {
-        editCellDayInput.value = day;
-        editCellPeriodInput.value = period;
-        subjectSelect.value = cellData.type;
-        subjectNameInput.value = cellData.name || '';
-        
-        timetableModal.classList.add('active');
-    }
-
-    btnSaveTimetable.addEventListener('click', () => {
-        const day = editCellDayInput.value;
-        const period = editCellPeriodInput.value;
-        const type = subjectSelect.value;
-        const customName = subjectNameInput.value.trim();
-        
-        if (!timetable[period]) {
-            timetable[period] = {};
-        }
-        
-        timetable[period][day] = {
-            type: type,
-            name: customName
-        };
-        
-        storage.set('timetable_data', timetable);
-        renderTimetable();
-        
-        timetableModal.classList.remove('active');
-    });
-
-    btnEditTimetable.addEventListener('click', toggleTimetableEdit);
-    closeTimetableModalBtn.addEventListener('click', () => timetableModal.classList.remove('active'));
-    btnCancelTimetable.addEventListener('click', () => timetableModal.classList.remove('active'));
-    
-    // Initial Render
-    renderTimetable();
 
 
     // ==========================================================================
