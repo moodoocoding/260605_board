@@ -1,0 +1,258 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>우리반 학급 대시보드</title>
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- FontAwesome for Icons -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Main Style Sheet -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="background-decorations">
+        <div class="glow-orb orb-1"></div>
+        <div class="glow-orb orb-2"></div>
+        <div class="glow-orb orb-3"></div>
+    </div>
+
+    <header class="app-header">
+        <div class="header-logo">
+            <i class="fa-solid fa-graduation-cap"></i>
+            <h1>우리반 학급 보드</h1>
+        </div>
+        <div class="live-clock-container">
+            <i class="fa-regular fa-clock"></i>
+            <span id="live-clock">2026. 06. 05. 00:00:00</span>
+        </div>
+    </header>
+
+    <main class="dashboard-grid">
+        <!-- LEFT PANEL: Classmate Name Picker -->
+        <section class="dashboard-panel panel-left" id="panel-names">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-user-group text-primary"></i> 우리반 이름 뽑기</h2>
+                <button class="icon-btn" id="open-names-modal" title="이름 목록 수정">
+                    <i class="fa-solid fa-gear"></i>
+                </button>
+            </div>
+            
+            <div class="panel-body">
+                <div class="picker-container">
+                    <div class="picker-display-card" id="name-display-card">
+                        <span class="picker-placeholder" id="name-placeholder">준비 완료!</span>
+                        <h3 class="picker-name" id="picker-result" style="display: none;">홍길동</h3>
+                    </div>
+                    
+                    <div class="picker-options">
+                        <label class="custom-checkbox">
+                            <input type="checkbox" id="exclude-drawn-checkbox" checked>
+                            <span class="checkmark"></span>
+                            중복 뽑기 금지 (제외)
+                        </label>
+                        <div class="remaining-count">
+                            남은 인원: <strong id="remaining-count-val">20</strong> / <span id="total-count-val">20</span>명
+                        </div>
+                    </div>
+
+                    <div class="picker-actions">
+                        <button class="btn btn-primary" id="btn-draw-one">
+                            <i class="fa-solid fa-shuffle"></i> 1명 뽑기
+                        </button>
+                        <button class="btn btn-secondary" id="btn-draw-multi">
+                            <i class="fa-solid fa-users"></i> 여러 명 뽑기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="history-container">
+                    <div class="history-header">
+                        <h3><i class="fa-solid fa-history"></i> 뽑힌 순서</h3>
+                        <button class="text-btn" id="btn-reset-history">초기화</button>
+                    </div>
+                    <div class="history-list" id="drawn-names-list">
+                        <!-- History items will be inserted dynamically -->
+                        <div class="empty-message">아직 뽑은 친구가 없습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- MIDDLE PANEL: First-Come Ticket Drawer -->
+        <section class="dashboard-panel panel-middle" id="panel-tickets">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-ticket text-secondary"></i> 선착순 번호표 뽑기</h2>
+                <button class="icon-btn text-danger" id="btn-reset-tickets" title="번호표 초기화">
+                    <i class="fa-solid fa-rotate-left"></i>
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="ticket-printer-section">
+                    <div class="printer-slot">
+                        <div class="printer-mouth"></div>
+                        <div class="printed-ticket-container" id="ticket-container">
+                            <!-- A dynamically generated ticket will slide out of here -->
+                        </div>
+                    </div>
+                    
+                    <div class="ticket-input-group">
+                        <input type="text" id="ticket-user-name" placeholder="이름을 입력하세요 (선택)" maxlength="10">
+                        <button class="btn btn-secondary-glowing" id="btn-get-ticket">
+                            <i class="fa-solid fa-circle-down"></i> 번호표 뽑기
+                        </button>
+                    </div>
+                </div>
+
+                <div class="ticket-rank-section">
+                    <h3><i class="fa-solid fa-list-ol"></i> 실시간 대기 순위</h3>
+                    <div class="rank-list" id="ticket-rank-list">
+                        <!-- Rankings will be inserted dynamically -->
+                        <div class="empty-message">아직 뽑은 번호표가 없습니다.</div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <!-- RIGHT PANEL: Classroom Timetable -->
+        <section class="dashboard-panel panel-right" id="panel-timetable">
+            <div class="panel-header">
+                <h2><i class="fa-solid fa-calendar-days text-accent"></i> 오늘 & 이번 주 시간표</h2>
+                <button class="btn-sm btn-outline" id="btn-edit-timetable">
+                    <i class="fa-solid fa-pen-to-square"></i> 시간표 관리
+                </button>
+            </div>
+
+            <div class="panel-body">
+                <div class="timetable-wrapper">
+                    <table class="timetable-grid">
+                        <thead>
+                            <tr>
+                                <th>교시</th>
+                                <th>월</th>
+                                <th>화</th>
+                                <th>수</th>
+                                <th>목</th>
+                                <th>금</th>
+                            </tr>
+                        </thead>
+                        <tbody id="timetable-body">
+                            <!-- Will be filled by JavaScript -->
+                        </tbody>
+                    </table>
+                </div>
+
+                <div class="timetable-legend">
+                    <div class="legend-item"><span class="legend-dot dot-kor"></span> 국어</div>
+                    <div class="legend-item"><span class="legend-dot dot-math"></span> 수학</div>
+                    <div class="legend-item"><span class="legend-dot dot-sci"></span> 과학</div>
+                    <div class="legend-item"><span class="legend-dot dot-eng"></span> 영어</div>
+                    <div class="legend-item"><span class="legend-dot dot-pe"></span> 체육</div>
+                    <div class="legend-item"><span class="legend-dot dot-art"></span> 미술/음악</div>
+                    <div class="legend-item"><span class="legend-dot dot-soc"></span> 사회/창체</div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <!-- MODAL: Edit Names -->
+    <div class="modal-overlay" id="names-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-user-pen"></i> 친구 이름 목록 수정</h3>
+                <button class="close-btn" id="close-names-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <p class="modal-desc">우리반 학생들의 이름을 한 줄에 하나씩 입력해 주세요. (기본 20명 설정)</p>
+                <textarea id="names-list-textarea" rows="12" placeholder="이름을 입력하세요..."></textarea>
+                <div class="modal-actions">
+                    <button class="btn btn-text" id="btn-cancel-names">취소</button>
+                    <button class="btn btn-primary" id="btn-save-names">저장하기</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Draw Multiple Names -->
+    <div class="modal-overlay" id="multi-draw-modal">
+        <div class="modal-container">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-users"></i> 여러 명 동시에 뽑기</h3>
+                <button class="close-btn" id="close-multi-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="multi-draw-count">뽑을 인원 선택:</label>
+                    <select id="multi-draw-count">
+                        <option value="2">2명</option>
+                        <option value="3">3명</option>
+                        <option value="4">4명</option>
+                        <option value="5">5명</option>
+                        <option value="6">6명</option>
+                        <option value="7">7명</option>
+                        <option value="8">8명</option>
+                        <option value="9">9명</option>
+                        <option value="10">10명</option>
+                    </select>
+                </div>
+                <div class="multi-results-container" id="multi-results-area" style="display: none;">
+                    <h4>당첨된 친구들:</h4>
+                    <div class="multi-results-grid" id="multi-results-grid"></div>
+                </div>
+                <div class="modal-actions">
+                    <button class="btn btn-text" id="btn-cancel-multi">닫기</button>
+                    <button class="btn btn-primary" id="btn-run-multi">뽑기 시작</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Edit Timetable Cell -->
+    <div class="modal-overlay" id="timetable-modal">
+        <div class="modal-container modal-small">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-edit"></i> 과목 변경</h3>
+                <button class="close-btn" id="close-timetable-modal">&times;</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="subject-select">과목 선택:</label>
+                    <select id="subject-select">
+                        <option value="kor">국어</option>
+                        <option value="math">수학</option>
+                        <option value="sci">과학</option>
+                        <option value="eng">영어</option>
+                        <option value="pe">체육</option>
+                        <option value="art">미술</option>
+                        <option value="mus">음악</option>
+                        <option value="soc">사회</option>
+                        <option value="ext">창체</option>
+                        <option value="hr">조퇴/자치</option>
+                        <option value="free">자율</option>
+                        <option value="empty">비어있음</option>
+                    </select>
+                </div>
+                <div class="form-group">
+                    <label for="subject-name-input">과목 이름 직접 입력 (선택):</label>
+                    <input type="text" id="subject-name-input" placeholder="직접 입력 시 과목명 반영">
+                </div>
+                <div class="modal-actions">
+                    <input type="hidden" id="edit-cell-day">
+                    <input type="hidden" id="edit-cell-period">
+                    <button class="btn btn-text" id="btn-cancel-timetable">취소</button>
+                    <button class="btn btn-primary" id="btn-save-timetable">변경 적용</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Particle/Confetti Container for Success Effects -->
+    <div class="confetti-container" id="confetti-container"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
